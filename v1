@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 import random
 import os
 
-url = "https://store.steampowered.com/app/"+$VARIABLEDELIDSTEAM
+IDJEU = "l'ID STEAM"
+
+url = "https://store.steampowered.com/app/{IDJEU}"
 
 save_dir = "OUTUVEUX"
 
