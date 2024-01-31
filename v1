@@ -3,27 +3,33 @@ from bs4 import BeautifulSoup
 import random
 import os
 
-IDJEU = "l'ID STEAM"
+dossier_courant = os.path.dirname(os.path.abspath(__file__))
 
-url = "https://store.steampowered.com/app/{IDJEU}"
+with open(os.path.join(dossier_courant, "jeux_ids.txt"), "r") as file:
+    jeux_ids = file.read().splitlines()
 
-save_dir = "OUTUVEUX"
+for IDJEU in jeux_ids:
+    url = "https://store.steampowered.com/app/{IDJEU}"
 
-response = requests.get(url)
-soup = BeautifulSoup(response.text, 'html.parser')
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
 
-nom_du_jeu_element = soup.find("div", class_="apphub_AppName")
-nom_du_jeu = nom_du_jeu_element.get_text().strip().replace(" ", "_")
+    nom_du_jeu_element = soup.find("div", class_="apphub_AppName")
+    nom_du_jeu = nom_du_jeu_element.get_text().strip().replace(" ", "_")
 
-image_elements = soup.find_all('a', class_='highlight_screenshot_link')
-image_urls = [element.get('href') for element in image_elements]
+    save_dir = os.path.join(dossier_courant, nom_du_jeu)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
 
-selected_images = random.sample(image_urls, 3)
+    image_elements = soup.find_all('a', class_='highlight_screenshot_link')
+    image_urls = [element.get('href') for element in image_elements]
 
-for idx, img_url in enumerate(selected_images):
-    img_response = requests.get(img_url)
-    if img_response.status_code == 200:
-        img_path = os.path.join(save_dir, f'{nom_du_jeu}_{idx}.jpg')
-        with open(img_path, 'wb') as file:
-            file.write(img_response.content)
-        print(f'Image {idx} téléchargée : {img_path}')
+    selected_images = random.sample(image_urls, 3)
+
+    for idx, img_url in enumerate(selected_images):
+        img_response = requests.get(img_url)
+        if img_response.status_code == 200:
+            img_path = os.path.join(save_dir, f'{nom_du_jeu}_{idx}.jpg')
+            with open(img_path, 'wb') as file:
+                file.write(img_response.content)
+            print(f'Image {idx} téléchargée : {img_path}')
